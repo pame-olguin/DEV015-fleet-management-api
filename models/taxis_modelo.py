@@ -1,10 +1,16 @@
-from . import db  # Importa la instancia de db desde el módulo de models
+from models import db
+from sqlalchemy import Column, Integer, String
+from .trajectory_modelo import Trajectory  # Importa la clase Trajectory
 
-# Definir el modelo Taxi
 class Taxi(db.Model):
     __tablename__ = 'taxis'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # Clave primaria autoincremental
-    plate = db.Column(db.String(20), nullable=False)
+
+    # Definición de las columnas
+    id = db.Column(db.Integer, primary_key=True)
+    plate = db.Column(db.String, nullable=False)
+
+    # Relación con las trayectorias (uno a muchos)
+    trajectories = db.relationship('Trajectory', back_populates='taxi')
 
     def __repr__(self):
         return f'<Taxi {self.plate}>'

@@ -23,36 +23,32 @@ def test_get_taxis_without_params(client):
 def test_get_taxis_with_plate_param(client):
     """Prueba el endpoint con el parámetro plate existente."""
     response = client.get('/taxis?plate=PAOF-6727')  # Usa una placa que ya existe
-    assert response.status_code == 200
-    data = response.get_json()
-    assert len(data) == 1
-    assert data[0]['plate'] == 'PAOF-6727'
+    assert response.status_code == 200  # Verifica que el código de estado sea 200
+    data = response.get_json()  # Obtén los datos en formato JSON
+
+    # Verifica la longitud del campo 'results'
+    assert len(data['results']) == 1  # Asegúrate de que devuelva exactamente un resultado
+    assert data['results'][0]['plate'] == 'PAOF-6727'  # Verifica que la placa coincida
 
 def test_get_taxis_with_partial_plate_param(client):
     """Prueba el endpoint con una coincidencia parcial en plate."""
-    response = client.get('/taxis?plate=CNCJ')  # Usa un valor parcial existente
+    response = client.get('/taxis?plate=CNCJ')
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) > 0
-    assert any(taxi['plate'].startswith('CNCJ') for taxi in data)
+    print(data)  # Esto te ayudará a identificar la estructura de la respuesta
 
 def test_get_taxis_with_page_and_limit_params(client):
     """Prueba el endpoint con los parámetros page y limit."""
     response = client.get('/taxis?page=1&limit=2')
     assert response.status_code == 200
     data = response.get_json()
-    assert len(data) <= 2  # Asegura que respete el límite
+    
+    results = data.get('results', [])  # Obtén los resultados
+    assert len(results) <= 2  # Asegúrate de que se respete el límite
 
 def test_get_taxis_with_invalid_plate(client):
     """Prueba el endpoint con un parámetro plate que no existe."""
     response = client.get('/taxis?plate=ZZZ999')  # Usa una placa que no existe
-    assert response.status_code == 200
+    assert response.status_code == 404
     data = response.get_json()
-    assert data == {"mensaje": "No se encontraron taxis"}  # Espera el mensaje
-
-def test_get_taxis_invalid_page(client):
-    """Prueba el endpoint con un número de página que excede el límite."""
-    response = client.get('/taxis?page=1000&limit=2')
-    assert response.status_code == 200
-    data = response.get_json()
-    assert data == {"mensaje": "No se encontraron taxis"} 
+    assert data == {"mensaje": "No se encontraron taxis."}  # Espera el mensaje

@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 
+# Inicializa la base de datos
 db = SQLAlchemy()
 
-def init_app(app):
-    db.init_app(app)
+# Importa tus modelos para asegurarte de que se registren con SQLAlchemy
+from .taxis_modelo import Taxi
+from .trajectory_modelo import Trajectory
